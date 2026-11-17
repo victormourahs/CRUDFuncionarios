@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Funcionários | PHP</title><link rel="stylesheet" href="assets/style.css"></head>
+<body><main class="container">
+<header class="top"><div><span class="eyebrow">PHP + HTML + MONGODB</span><h1>Gestão de Funcionários</h1><p>Cadastre, consulte, edite e remova registros.</p></div><span class="tag">CRUD completo</span></header>
+<?php if ($error): ?><div role="alert" class="message error"><?= h($error) ?></div><?php elseif ($status): ?><div role="status" class="message"><?= h($status) ?></div><?php endif; ?>
+<section class="panel"><h2><?= $editing ? 'Editar funcionário' : 'Novo funcionário' ?></h2>
+<form action="index.php" method="post"><input type="hidden" name="csrf" value="<?= h($_SESSION['csrf']) ?>"><input type="hidden" name="acao" value="<?= $editing ? 'editar' : 'criar' ?>">
+<?php if ($editing): ?><input type="hidden" name="id" value="<?= h($editing['_id']) ?>"><?php endif; ?>
+<div class="fields"><label>Matrícula<input name="matricula" maxlength="40" required value="<?= h($editing['matricula'] ?? '') ?>" placeholder="Ex.: 1001"></label><label>Nome<input name="nome" maxlength="120" required value="<?= h($editing['nome'] ?? '') ?>" placeholder="Nome completo"></label><label>Salário (R$)<input name="salario" type="number" min="0" step="0.01" required value="<?= h($editing['salario'] ?? '') ?>" placeholder="0,00"></label><label>Função<input name="funcao" maxlength="100" required value="<?= h($editing['funcao'] ?? '') ?>" placeholder="Ex.: Analista"></label></div>
+<div class="actions"><button class="primary" type="submit"><?= $editing ? 'Salvar alterações' : 'Adicionar funcionário' ?></button><?php if ($editing): ?><a class="secondary" href="index.php" style="display:inline-flex;align-items:center;border-radius:9px;padding:12px 18px;text-decoration:none;font-weight:650">Cancelar edição</a><?php endif; ?></div>
+</form></section>
+<section class="panel"><div class="list-head"><div><h2>Funcionários cadastrados</h2><p><?= count($funcionarios) ?> registro(s) exibido(s)</p></div><form method="get" action="index.php"><input name="busca" type="search" aria-label="Buscar funcionários" placeholder="Buscar nome, matrícula ou função" value="<?= h($_GET['busca'] ?? '') ?>"></form></div>
+<div class="table-scroll"><table><thead><tr><th>Matrícula</th><th>Nome</th><th>Função</th><th>Salário</th><th>Ações</th></tr></thead><tbody>
+<?php if (!$funcionarios): ?><tr><td colspan="5" class="empty">Nenhum funcionário encontrado.</td></tr><?php endif; ?>
+<?php foreach ($funcionarios as $item): ?><tr><td><?= h($item['matricula'] ?? '') ?></td><td><?= h($item['nome'] ?? '') ?></td><td><?= h($item['funcao'] ?? '') ?></td><td>R$ <?= h(number_format((float) ($item['salario'] ?? 0), 2, ',', '.')) ?></td><td class="row-actions"><a href="?editar=<?= urlencode((string) $item['_id']) ?>" class="small secondary" style="text-decoration:none;display:inline-block;border-radius:9px">Editar</a> <form action="index.php" method="post" style="display:inline" onsubmit="return confirm('Excluir este funcionário?')"><input type="hidden" name="csrf" value="<?= h($_SESSION['csrf']) ?>"><input type="hidden" name="acao" value="excluir"><input type="hidden" name="id" value="<?= h($item['_id']) ?>"><button type="submit" class="small danger">Excluir</button></form></td></tr><?php endforeach; ?>
+</tbody></table></div></section><footer>Exemplo acadêmico • Exclusão física</footer>
+</main></body></html>
